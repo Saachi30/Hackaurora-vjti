@@ -52,54 +52,13 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
-    try {
-      if (!account) {
-        const connected = await connectWallet();
-        if (!connected) {
-          setErrors({ submit: 'Please connect your wallet first' });
-          return;
-        }
+    if (validateForm()) {
+      try {
+        // Handle registration logic here
+        navigate('/login');
+      } catch (error) {
+        console.error('Registration failed:', error);
       }
-
-      setIsRegistering(true);
-
-      if (userType === 'vendor') {
-        // Register vendor
-        const gstNumber = ethers.BigNumber.from(formData.gst.replace(/\D/g, ''));
-        const tx = await contract.registerVendor(
-          formData.companyName, // organization name
-          gstNumber, // Convert GST to BigNumber
-          formData.headOfficeLocation // location
-        );
-        await tx.wait();
-      } else {
-        // Register consumer
-        const tx = await contract.registerConsumer(
-          formData.name,
-          formData.email,
-          formData.contact
-        );
-        await tx.wait();
-      }
-
-      // Listen for registration events
-      contract.on(userType === 'vendor' ? 'VendorRegistered' : 'ConsumerRegistered', 
-        (registeredAddress, name) => {
-          if (registeredAddress.toLowerCase() === account.toLowerCase()) {
-            navigate('/login');
-          }
-      });
-
-      navigate('/login');
-    } catch (error) {
-      console.error('Registration error:', error);
-      setErrors({ 
-        submit: error.message || 'Registration failed. Please try again.' 
-      });
-    } finally {
-      setIsRegistering(false);
     }
   };
 
@@ -111,7 +70,7 @@ export const Register = () => {
       </label>
       <div className="mt-1 relative">
         <input
-          type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
+          type={type === 'password' ? (name === 'password' ? (showPassword ? 'text' : 'password') : (showConfirmPassword ? 'text' : 'password')) : type}
           required={required}
           className={`block w-full px-3 py-2 border ${
             errors[name] ? 'border-red-500' : 'border-gray-300'
@@ -128,9 +87,15 @@ export const Register = () => {
           <button
             type="button"
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            onClick={() => setShowPassword(!showPassword)}
+            onClick={() => {
+              if (name === 'password') {
+                setShowPassword(!showPassword);
+              } else {
+                setShowConfirmPassword(!showConfirmPassword);
+              }
+            }}
           >
-            {showPassword ? (
+            {(name === 'password' ? showPassword : showConfirmPassword) ? (
               <EyeOff className="h-5 w-5 text-gray-400" />
             ) : (
               <Eye className="h-5 w-5 text-gray-400" />

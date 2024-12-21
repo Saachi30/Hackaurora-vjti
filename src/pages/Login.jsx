@@ -65,8 +65,12 @@ export const Login = () => {
       localStorage.setItem('userType', userType);
       
       // Navigate to dashboard
-      navigate('/'); // This will take user to the main dashboard page
-      
+      //navigate('/'); // This will take user to the main dashboard page
+      if (userType === 'consumer') {
+        navigate('/consumer/dashboard');
+      } else {
+        navigate('/vendor/dashboard');
+      }
     } catch (error) {
       setError('Invalid email or password. Please try again.');
     } finally {

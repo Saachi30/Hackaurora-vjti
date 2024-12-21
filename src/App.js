@@ -12,7 +12,7 @@ import { Leaderboard } from './pages/consumer/Leaderboard';
 import { EnvironmentalImpact } from './pages/common/EnvironmentalImpact';
 import { SearchProducts } from './pages/common/SearchProducts';
 import FloatingChatButton from './pages/common/FloatingChatButton';
-import { Web3Provider } from './Web3Context';
+import ProfilePage from './pages/common/Page/ProfilePage.js';
 
 const App = () => {
   return (
@@ -30,6 +30,7 @@ const App = () => {
           
           <Route path="/environmental-impact" element={<EnvironmentalImpact />} />
           <Route path="/notices" element={<Notices />} />
+          <Route path='/profile' element={<ProfilePage/>}/>
 
           {/* Vendor Routes */}
         
