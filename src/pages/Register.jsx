@@ -1,5 +1,5 @@
 // File: src/pages/Register.jsx
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
@@ -46,14 +46,30 @@ export const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        // Handle registration logic here
+        const userData = {
+          ...formData,
+          userType,
+          timestamp: new Date().toISOString()
+        };
+
+        const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+        
+        if (existingUsers.some(user => user.email === formData.email)) {
+          setErrors({ email: 'Email already registered' });
+          return;
+        }
+
+        existingUsers.push(userData);
+        localStorage.setItem('users', JSON.stringify(existingUsers));
+
         navigate('/login');
       } catch (error) {
         console.error('Registration failed:', error);
+        setErrors({ submit: 'Registration failed. Please try again.' });
       }
     }
   };
@@ -65,7 +81,7 @@ export const Register = () => {
       </label>
       <div className="mt-1 relative">
         <input
-          type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
+          type={type === 'password' ? (name === 'password' ? (showPassword ? 'text' : 'password') : (showConfirmPassword ? 'text' : 'password')) : type}
           required={required}
           className={`block w-full px-3 py-2 border ${
             errors[name] ? 'border-red-500' : 'border-gray-300'
@@ -82,9 +98,15 @@ export const Register = () => {
           <button
             type="button"
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            onClick={() => setShowPassword(!showPassword)}
+            onClick={() => {
+              if (name === 'password') {
+                setShowPassword(!showPassword);
+              } else {
+                setShowConfirmPassword(!showConfirmPassword);
+              }
+            }}
           >
-            {showPassword ? (
+            {(name === 'password' ? showPassword : showConfirmPassword) ? (
               <EyeOff className="h-5 w-5 text-gray-400" />
             ) : (
               <Eye className="h-5 w-5 text-gray-400" />
