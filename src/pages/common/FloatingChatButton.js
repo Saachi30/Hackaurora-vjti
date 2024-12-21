@@ -14,7 +14,7 @@ const FloatingChatButton = () => {
       setMessages(prev => [...prev, { type: 'user', content: questions }]);
       
       const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyAzBDNc5K5N3h7ZYLs3u0oxseP6tRx3CUY",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBXvyQXa7LjTNqqDkm3uvubhhkQ1A5dWZs",
         {
           method: "POST",
           headers: {
