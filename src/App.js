@@ -11,6 +11,7 @@ import { ProductTracking } from './pages/common/ProductTracking';
 import { Leaderboard } from './pages/consumer/Leaderboard';
 import { EnvironmentalImpact } from './pages/common/EnvironmentalImpact';
 import { SearchProducts } from './pages/common/SearchProducts';
+import FloatingChatButton from './pages/common/FloatingChatButton';
 
 const App = () => {
   return (
@@ -49,6 +50,7 @@ const App = () => {
           {/* Default Route */}
           {/* <Route path="/" element={<Navigate to="/login" />} /> */}
         </Routes>
+        <FloatingChatButton/>
       </div>
     </BrowserRouter>
   );
