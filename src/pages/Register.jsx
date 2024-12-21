@@ -1,14 +1,19 @@
 // File: src/pages/Register.jsx
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useWeb3 } from '.././Web3Context'; // Update path as needed
+import { ethers } from 'ethers';
 
 export const Register = () => {
   const navigate = useNavigate();
+  const { contract, account, connectWallet } = useWeb3();
   const [userType, setUserType] = useState('consumer');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,6 +27,7 @@ export const Register = () => {
     website: '',
     documents: null
   });
+  
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -32,8 +38,6 @@ export const Register = () => {
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Invalid email format';
     if (!formData.contact.trim()) newErrors.contact = 'Contact is required';
     if (!/^\d{10}$/.test(formData.contact)) newErrors.contact = 'Invalid contact number';
-    if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
 
     if (userType === 'vendor') {
       if (!formData.gst.trim()) newErrors.gst = 'GST number is required';
@@ -46,18 +50,60 @@ export const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      try {
-        // Handle registration logic here
-        navigate('/login');
-      } catch (error) {
-        console.error('Registration failed:', error);
+    if (!validateForm()) return;
+
+    try {
+      if (!account) {
+        const connected = await connectWallet();
+        if (!connected) {
+          setErrors({ submit: 'Please connect your wallet first' });
+          return;
+        }
       }
+
+      setIsRegistering(true);
+
+      if (userType === 'vendor') {
+        // Register vendor
+        const gstNumber = ethers.BigNumber.from(formData.gst.replace(/\D/g, ''));
+        const tx = await contract.registerVendor(
+          formData.companyName, // organization name
+          gstNumber, // Convert GST to BigNumber
+          formData.headOfficeLocation // location
+        );
+        await tx.wait();
+      } else {
+        // Register consumer
+        const tx = await contract.registerConsumer(
+          formData.name,
+          formData.email,
+          formData.contact
+        );
+        await tx.wait();
+      }
+
+      // Listen for registration events
+      contract.on(userType === 'vendor' ? 'VendorRegistered' : 'ConsumerRegistered', 
+        (registeredAddress, name) => {
+          if (registeredAddress.toLowerCase() === account.toLowerCase()) {
+            navigate('/login');
+          }
+      });
+
+      navigate('/login');
+    } catch (error) {
+      console.error('Registration error:', error);
+      setErrors({ 
+        submit: error.message || 'Registration failed. Please try again.' 
+      });
+    } finally {
+      setIsRegistering(false);
     }
   };
 
+  // Rest of your existing renderField function and UI code remains the same
   const renderField = (name, label, type = 'text', required = true) => (
     <div>
       <label className="block text-sm font-medium text-gray-700">
@@ -101,6 +147,25 @@ export const Register = () => {
     </div>
   );
 
+  // Add a wallet connection status indicator
+  const renderWalletStatus = () => (
+    <div className="text-center mb-4">
+      {account ? (
+        <div className="text-sm text-green-600">
+          Connected: {account.slice(0, 6)}...{account.slice(-4)}
+        </div>
+      ) : (
+        <button
+          onClick={connectWallet}
+          className="text-sm text-blue-600 hover:text-blue-500"
+        >
+          Connect Wallet to Register
+        </button>
+      )}
+    </div>
+  );
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
@@ -112,7 +177,13 @@ export const Register = () => {
           <h2 className="text-3xl font-bold text-gray-800">Create Account</h2>
           <p className="text-gray-600 mt-2">Join our sustainable supply chain network</p>
         </div>
+        {renderWalletStatus()}
 
+{errors.submit && (
+  <div className="mb-4 text-center text-red-600 bg-red-50 p-2 rounded">
+    {errors.submit}
+  </div>
+)}
         <div className="flex justify-center mb-6">
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
@@ -246,13 +317,18 @@ export const Register = () => {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            type="submit"
-          >
-            Create Account
-          </motion.button>
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          disabled={isRegistering || !account}
+          className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white 
+            ${isRegistering || !account ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+          type="submit"
+        >
+          {isRegistering ? 'Registering...' : 'Create Account'}
+        </motion.button>
+
+        
         </form>
 
         <div className="mt-6 text-center">

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Upload, Plus, X } from 'lucide-react';
+import { useWeb3 } from '../../Web3Context';
+import { ethers } from 'ethers';
 
 const AddProduct = () => {
+  const { contract, account, connectWallet } = useWeb3();
   const [formData, setFormData] = useState({
     productName: '',
     description: '',
@@ -11,10 +14,14 @@ const AddProduct = () => {
     sourceLocation: '',
     manufacturingLocation: '',
     certifications: [],
-    barcode: ''
+    barcode: '',
+    rawMaterials: []
   });
 
   const [dragActive, setDragActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -34,10 +41,61 @@ const AddProduct = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log(formData);
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      if (!contract || !account) {
+        const connected = await connectWallet();
+        if (!connected) {
+          throw new Error('Please connect your wallet first');
+        }
+      }
+
+      // Convert price to wei
+      const priceWei = ethers.utils.parseEther(formData.price.toString());
+      const quantity = parseInt(formData.quantity);
+      const barcode = parseInt(formData.barcode);
+      
+      // Default raw materials array
+      const rawMaterials = [];
+
+      // Call the smart contract method
+      const transaction = await contract.addProduct(
+        formData.productName,
+        formData.category,
+        formData.description,
+        priceWei,
+        quantity,
+        barcode,
+        rawMaterials
+      );
+
+      // Wait for the transaction to be mined
+      await transaction.wait();
+
+      setSuccess('Product successfully added to the blockchain!');
+      // Reset form after successful submission
+      setFormData({
+        productName: '',
+        description: '',
+        category: '',
+        price: '',
+        quantity: '',
+        sourceLocation: '',
+        manufacturingLocation: '',
+        certifications: [],
+        barcode: '',
+        rawMaterials: []
+      });
+    } catch (err) {
+      setError(err.message || 'Failed to add product to blockchain');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,6 +104,34 @@ const AddProduct = () => {
         <h1 className="text-2xl font-bold text-gray-800">Add New Product</h1>
         <p className="text-gray-600">Enter product details to add to the blockchain</p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+          <h3 className="text-red-800 font-medium">Error</h3>
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+
+      {success && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+          <h3 className="text-green-800 font-medium">Success</h3>
+          <p className="text-green-700">{success}</p>
+        </div>
+      )}
+
+      {!account && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+         
+          <p className="text-blue-700">
+            <button 
+              onClick={connectWallet}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Connect your wallet
+            </button>
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -99,10 +185,11 @@ const AddProduct = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price
+                Price (ETH)
               </label>
               <input
                 type="number"
+                step="0.0001"
                 name="price"
                 value={formData.price}
                 onChange={handleChange}
@@ -127,6 +214,20 @@ const AddProduct = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Barcode Number
+              </label>
+              <input
+                type="number"
+                name="barcode"
+                value={formData.barcode}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Source Location
               </label>
               <input
@@ -139,57 +240,22 @@ const AddProduct = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Manufacturing Location
-              </label>
-              <input
-                type="text"
-                name="manufacturingLocation"
-                value={formData.manufacturingLocation}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Product Images
-              </label>
-              <div 
-                className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                  dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrag}
+            <div className="mt-6 md:col-span-2 flex justify-end space-x-4">
+              <button
+                type="button"
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                disabled={loading}
               >
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <p className="mt-2 text-sm text-gray-600">
-                  Drag and drop your images here, or{' '}
-                  <button type="button" className="text-blue-500 hover:text-blue-600">
-                    browse
-                  </button>
-                </p>
-              </div>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
+                disabled={loading || !account}
+              >
+                {loading ? 'Adding Product...' : 'Add Product'}
+              </button>
             </div>
-          </div>
-
-          <div className="mt-6 flex justify-end space-x-4">
-            <button
-              type="button"
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Add Product
-            </button>
           </div>
         </div>
       </form>

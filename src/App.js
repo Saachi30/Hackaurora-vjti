@@ -12,9 +12,11 @@ import { Leaderboard } from './pages/consumer/Leaderboard';
 import { EnvironmentalImpact } from './pages/common/EnvironmentalImpact';
 import { SearchProducts } from './pages/common/SearchProducts';
 import FloatingChatButton from './pages/common/FloatingChatButton';
+import { Web3Provider } from './Web3Context';
 
 const App = () => {
   return (
+    <Web3Provider>
     <BrowserRouter>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
         <Routes>
@@ -23,7 +25,7 @@ const App = () => {
           <Route path="/" element={<ConsumerDashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/product-tracking" element={<ProductTracking />} />
+          <Route path="/product-tracking/:productId" element={<ProductTracking />} />
           <Route path="/order-history" element={<OrderHistory />} />
           
           <Route path="/environmental-impact" element={<EnvironmentalImpact />} />
@@ -53,6 +55,7 @@ const App = () => {
         <FloatingChatButton/>
       </div>
     </BrowserRouter>
+    </Web3Provider>
   );
 };
 
