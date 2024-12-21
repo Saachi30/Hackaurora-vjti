@@ -53,7 +53,7 @@ export const VendorDashboard = () => {
       icon: ChartBarIcon,
       title: 'Leaderboard',
       description: 'View sustainability rankings',
-      path: '/leaderboard'
+      path: '/vendor/leaderboard'
     },
     {
       icon: BellIcon,

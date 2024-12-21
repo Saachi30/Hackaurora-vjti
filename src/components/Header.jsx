@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BellIcon, SearchIcon } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, AlertCircle, Info } from 'lucide-react';
+import Profile from '../assets/profile.png';
+const isAuthenticated = () => {
+  // Replace this with your actual authentication check
+  return localStorage.getItem('token') !== null;
+};
+
 const Header = () => {
   const navigate = useNavigate();
-  const getIcon = (type) => {
-    switch (type) {
-      case 'alert':
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
-      case 'update':
-        return <Bell className="w-4 h-4 text-blue-500" />;
-      case 'info':
-        return <Info className="w-4 h-4 text-gray-500" />;
-      default:
-        return null;
-    }
-  };
+  const isLoggedIn = isAuthenticated();
+
   const [notices] = useState([
     {
       id: 1,
@@ -39,9 +34,14 @@ const Header = () => {
   ]);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const toggleProfileMenu = () => {
+    setIsProfileMenuOpen(!isProfileMenuOpen);
   };
 
   return (
@@ -60,20 +60,10 @@ const Header = () => {
           TrackBack
         </motion.h1>
 
-        {/* Search Bar */}
-        {/* <div className="relative flex items-center w-1/2 max-w-md">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-          />
-          <SearchIcon className="absolute left-3 w-5 h-5 text-gray-400" />
-        </div> */}
-
         {/* Action Buttons */}
         <div className="flex items-center space-x-6">
-               {/* Notification Bell */}
-               <div className="relative">
+          {/* Notification Bell */}
+          <div className="relative">
             <button
               className="relative p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
               onClick={toggleDropdown}
@@ -97,7 +87,6 @@ const Header = () => {
                         key={notice.id}
                         className="p-4 flex items-start space-x-3 hover:bg-gray-50 cursor-pointer"
                       >
-                        {getIcon(notice.type)}
                         <div>
                           <p className="text-sm font-medium text-gray-700">{notice.title}</p>
                           <p className="text-xs text-gray-500">
@@ -113,17 +102,50 @@ const Header = () => {
               </div>
             )}
           </div>
-        
 
-          {/* Login Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-            onClick={() => navigate('/login')}
-          >
-            Log In
-          </motion.button>
+          {/* Profile or Login Button */}
+          {isLoggedIn ? (
+            <div className="relative">
+              <button
+                className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center hover:bg-gray-300 transition"
+                onClick={toggleProfileMenu}
+              >
+                <img
+                  src={Profile}
+                  alt="Profile"
+                  className="w-12 h-12 rounded-full"
+                />
+              </button>
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
+                  <ul className="divide-y divide-gray-200">
+                    <li
+                      className="p-4 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => navigate('/profile')}
+                    >
+                      My Profile
+                    </li>
+                    <li
+                      className="p-4 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => {
+                        localStorage.removeItem('token');
+                        navigate('/login');
+                      }}
+                    >
+                      Logout
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </button>
+          )}
         </div>
       </div>
     </motion.header>
@@ -131,7 +153,6 @@ const Header = () => {
 };
 
 export default Header;
-
 
 
 // import React, { useState } from 'react';
