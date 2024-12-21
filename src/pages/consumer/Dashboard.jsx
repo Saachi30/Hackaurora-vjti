@@ -3,6 +3,12 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, TruckIcon, HistoryIcon, ChartBarIcon, BellIcon, LeafIcon } from 'lucide-react';
 
+// Helper function to check if user is authenticated
+const isAuthenticated = () => {
+  // Replace this with your actual authentication check
+  return localStorage.getItem('token') !== null;
+};
+
 const DashboardCard = ({ icon: Icon, title, description, onClick }) => (
   <motion.div
     whileHover={{ scale: 1.03 }}
@@ -25,42 +31,58 @@ const DashboardCard = ({ icon: Icon, title, description, onClick }) => (
 export const ConsumerDashboard = () => {
   const navigate = useNavigate();
 
+  const handleNavigation = (path, requiresAuth) => {
+    if (requiresAuth && !isAuthenticated()) {
+      // Redirect to login page and store the intended destination
+      localStorage.setItem('redirectAfterLogin', path);
+      navigate('/login');
+      return;
+    }
+    navigate(path);
+  };
+
   const dashboardItems = [
     {
       icon: SearchIcon,
       title: 'Search Products',
       description: 'Find and verify products using blockchain',
-      path: '/search-products'
+      path: '/search-products',
+      requiresAuth: false // This route is public
     },
     {
       icon: TruckIcon,
       title: 'Product Tracking',
       description: 'Track products and verify authenticity',
-      path: '/product-tracking'
+      path: '/product-tracking',
+      requiresAuth: true
     },
     {
       icon: HistoryIcon,
       title: 'Order History',
       description: 'View your past purchases and their impact',
-      path: '/order-history'
+      path: '/order-history',
+      requiresAuth: true
     },
     {
       icon: ChartBarIcon,
       title: 'Leaderboard',
       description: 'See how you rank in sustainable shopping',
-      path: '/leaderboard'
+      path: '/leaderboard',
+      requiresAuth: true
     },
     {
       icon: BellIcon,
       title: 'Notices',
       description: 'Important updates and announcements',
-      path: '/notices'
+      path: '/notices',
+      requiresAuth: true
     },
     {
       icon: LeafIcon,
       title: 'Environmental Impact',
       description: 'Track your carbon footprint and green score',
-      path: '/environmental-impact'
+      path: '/environmental-impact',
+      requiresAuth: true
     },
   ];
 
@@ -80,7 +102,7 @@ export const ConsumerDashboard = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            onClick={() => navigate('/ar-vr')}
+            onClick={() => handleNavigation('/ar-vr', true)}
           >
             AR/VR Scan
           </motion.button>
@@ -96,7 +118,7 @@ export const ConsumerDashboard = () => {
             >
               <DashboardCard 
                 {...item} 
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigation(item.path, item.requiresAuth)}
               />
             </motion.div>
           ))}

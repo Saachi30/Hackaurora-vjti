@@ -10,6 +10,7 @@ import Notices from './pages/common/Notices';
 import { ProductTracking } from './pages/common/ProductTracking';
 import { Leaderboard } from './pages/consumer/Leaderboard';
 import { EnvironmentalImpact } from './pages/common/EnvironmentalImpact';
+import { SearchProducts } from './pages/common/SearchProducts';
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const App = () => {
             <Route path="/vendor/leaderboard" element={<Leaderboard />} />
             <Route path="/vendor/orders" element={<OrderHistory />} />
             <Route path="/vendor/notices" element={<Notices />} />
+            <Route path='/search-products' element={<SearchProducts/>}/>
          
 
           {/* Consumer Routes */}
