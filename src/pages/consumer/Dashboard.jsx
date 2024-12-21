@@ -89,7 +89,7 @@ export const ConsumerDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-500/10 to-blue-500/50 pt-2 flex flex-col gap-7 ">
+    <div className="min-h-screen bg-gradient-to-br from-green-500/10 to-blue-500/50 pt-2 pb-6 flex flex-col gap-7 ">
       <Header />
       <motion.div
         initial={{ opacity: 0, y: 20 }}

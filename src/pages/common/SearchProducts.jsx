@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { 
   Search, 
   Box, 
@@ -172,9 +173,9 @@ export const SearchProducts = () => {
 
                 {/* Action Buttons */}
                 <div className="mt-4 flex gap-4">
-                  <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  <Link to='/product-tracking'><button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                     View Details
-                  </button>
+                  </button></Link>
                 </div>
               </div>
 
