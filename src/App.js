@@ -8,7 +8,7 @@ import OrderHistory from './pages/common/OrderHistory';
 import AddProduct from './pages/vendor/AddProduct';
 import Notices from './pages/common/Notices';
 import { ProductTracking } from './pages/common/ProductTracking';
-import { Leaderboard } from './pages/common/Leaderboard';
+import { Leaderboard } from './pages/consumer/Leaderboard';
 import { EnvironmentalImpact } from './pages/common/EnvironmentalImpact';
 
 const App = () => {
@@ -18,12 +18,12 @@ const App = () => {
         <Routes>
           {/* Auth Routes */}
           {/* <Route path="/login" element={<Login />} /> */}
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<ConsumerDashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/product-tracking" element={<ProductTracking />} />
           <Route path="/order-history" element={<OrderHistory />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
+          
           <Route path="/environmental-impact" element={<EnvironmentalImpact />} />
           <Route path="/notices" element={<Notices />} />
 
@@ -31,6 +31,7 @@ const App = () => {
         
             <Route path="/vendor/dashboard" element={<VendorDashboard />} />
             <Route path="/vendor/add-product" element={<AddProduct />} />
+            <Route path="/vendor/leaderboard" element={<Leaderboard />} />
             <Route path="/vendor/orders" element={<OrderHistory />} />
             <Route path="/vendor/notices" element={<Notices />} />
          
@@ -38,6 +39,7 @@ const App = () => {
           {/* Consumer Routes */}
     
             <Route path="/consumer/dashboard" element={<ConsumerDashboard />} />
+            <Route path="/consumer/leaderboard" element={<Leaderboard />} />
             <Route path="/consumer/orders" element={<OrderHistory />} />
             <Route path="/consumer/notices" element={<Notices />} />
           

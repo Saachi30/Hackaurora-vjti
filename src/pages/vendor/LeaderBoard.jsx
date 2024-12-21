@@ -4,10 +4,10 @@ import { ArrowUp, ArrowDown } from 'lucide-react';
 export const Leaderboard = () => {
   const leaderboardData = [
     { rank: 1, name: "EcoVendors Ltd", score: 95, change: "up", type: "Vendor" },
-    { rank: 2, name: "Green Consumer Co", score: 92, change: "down", type: "Consumer" },
+    { rank: 2, name: "Green Co", score: 92, change: "down", type: "Consumer" },
     { rank: 3, name: "Sustainable Solutions", score: 88, change: "up", type: "Vendor" },
     { rank: 4, name: "EarthFirst Trading", score: 85, change: "up", type: "Vendor" },
-    { rank: 5, name: "Sarah Johnson", score: 82, change: "down", type: "Consumer" }
+    { rank: 5, name: "Sustain Growth Ltd", score: 82, change: "down", type: "Consumer" }
   ];
 
   return (
@@ -18,17 +18,17 @@ export const Leaderboard = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="grid grid-cols-5 bg-green-50 p-4 font-semibold text-gray-700">
+        <div className="grid grid-cols-4 bg-green-50 p-4 font-semibold text-gray-700 ">
           <div>Rank</div>
           <div className="col-span-2">Name</div>
           <div>Green Score</div>
-          <div>Type</div>
+          
         </div>
 
         {leaderboardData.map((item) => (
           <div 
             key={item.rank}
-            className="grid grid-cols-5 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            className="grid grid-cols-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors "
           >
             <div className="flex items-center">
               <span className={`
@@ -55,14 +55,14 @@ export const Leaderboard = () => {
               </div>
               <span>{item.score}</span>
             </div>
-            <div className="flex items-center">
-              <span className={`
+            {/* <div className="flex items-center">
+              {/* <span className={`
                 px-3 py-1 rounded-full text-sm
                 ${item.type === 'Vendor' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}
               `}>
                 {item.type}
-              </span>
-            </div>
+              </span> 
+            </div> */}
           </div>
         ))}
       </div>
