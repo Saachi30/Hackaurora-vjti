@@ -3,6 +3,7 @@ import { Calendar, Clock, Package, Truck, Leaf } from 'lucide-react';
 import { useWeb3 } from '../../Web3Context';
 import { ethers } from 'ethers';
 import emailjs from '@emailjs/browser';
+import GreenScoreCalculator from './GreenScoreCalculator.js';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -10,6 +11,8 @@ const OrderHistory = () => {
   const [error, setError] = useState(null);
   const { contract, account, connectWallet } = useWeb3();
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const calculator = new GreenScoreCalculator();
+
   // Helper function to safely convert BigNumber to string
   const safeToString = (value) => {
     try {
@@ -66,6 +69,12 @@ const OrderHistory = () => {
                    step.status === "Purchased"
           );
 
+          // Calculate green score
+          const greenScore = await calculator.analyzeProduct(
+            String(productDetails[0] || ''),
+            String(productDetails[1] || '')
+          );
+
           const processedOrder = {
             id: safeToString(productId),
             name: String(productDetails[0] || ''),
@@ -75,7 +84,7 @@ const OrderHistory = () => {
             currentQuantity: safeToString(productDetails[4]),
             purchasedQuantity: purchaseStep ? safeToString(purchaseStep.quantity) : '0',
             barcodeNo: String(productDetails[5] || ''),
-            greenScore: safeToString(productDetails[7] || '0'),
+            greenScore: greenScore, // Use calculated green score
             purchaseDate: purchaseStep ? 
               new Date(Number(safeToString(purchaseStep.timestamp)) * 1000) : 
               new Date(),
@@ -142,17 +151,7 @@ const OrderHistory = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading orders...</p>
-        </div>
-      </div>
-    );
-  }
-const generateMonthlyReport = () => {
+  const generateMonthlyReport = () => {
     const currentDate = new Date();
     const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
     const currentYear = currentDate.getFullYear();
@@ -172,7 +171,7 @@ const generateMonthlyReport = () => {
     const averageGreenScore = monthlyOrders.reduce((sum, order) => 
       sum + parseInt(order.greenScore), 0) / totalOrders || 0;
 
-    // Generate report message in the requested format
+    // Generate report message
     const message = `
 Monthly Transaction Report - ${currentMonth} ${currentYear}
 
@@ -202,7 +201,6 @@ Generated on: ${currentDate.toLocaleString()}
       setIsSendingEmail(true);
       
       const templateParams = {
-        // You can make this configurable
         message: generateMonthlyReport()
       };
       await emailjs.send(
@@ -220,6 +218,18 @@ Generated on: ${currentDate.toLocaleString()}
       setIsSendingEmail(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="p-6 max-w-7xl mx-auto">
@@ -257,7 +267,6 @@ Generated on: ${currentDate.toLocaleString()}
           disabled={isSendingEmail}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-blue-300"
         >
-         
           <span>{isSendingEmail ? 'Sending...' : 'Email Monthly Report'}</span>
         </button>
       </div>
