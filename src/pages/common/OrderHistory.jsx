@@ -130,15 +130,15 @@ const OrderHistory = () => {
 
   const formatPrice = (priceString) => {
     try {
-      if (!priceString) return '0.00 USD';
+      if (!priceString) return '0.001 ETH';
       const formattedPrice = ethers.utils.formatEther(priceString);
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'ETH'
       }).format(parseFloat(formattedPrice));
     } catch (error) {
       console.error('Error formatting price:', error);
-      return '0.00 USD';
+      return '0.001 ETH';
     }
   };
 
