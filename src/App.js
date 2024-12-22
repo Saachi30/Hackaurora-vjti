@@ -13,6 +13,7 @@ import { EnvironmentalImpact } from './pages/common/EnvironmentalImpact';
 import { SearchProducts } from './pages/common/SearchProducts';
 import FloatingChatButton from './pages/common/FloatingChatButton';
 import { Web3Provider } from './Web3Context';
+import ProfileDashboard from './pages/common/Page/ProfilePage';
 
 const App = () => {
   return (
@@ -30,6 +31,9 @@ const App = () => {
           
           <Route path="/environmental-impact" element={<EnvironmentalImpact />} />
           <Route path="/notices" element={<Notices />} />
+          <Route path="/profile" element={<ProfileDashboard />} />
+          
+
 
           {/* Vendor Routes */}
         
