@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Package, Truck, Leaf } from 'lucide-react';
 import { useWeb3 } from '../../Web3Context';
 import { ethers } from 'ethers';
+import emailjs from '@emailjs/browser';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { contract, account, connectWallet } = useWeb3();
-
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
   // Helper function to safely convert BigNumber to string
   const safeToString = (value) => {
     try {
@@ -151,7 +152,74 @@ const OrderHistory = () => {
       </div>
     );
   }
+const generateMonthlyReport = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+    const currentYear = currentDate.getFullYear();
 
+    // Filter orders for current month
+    const monthlyOrders = orders.filter(order => {
+      const orderDate = new Date(order.purchaseDate);
+      return orderDate.getMonth() === currentDate.getMonth() && 
+             orderDate.getFullYear() === currentYear;
+    });
+
+    // Calculate monthly statistics
+    const totalOrders = monthlyOrders.length;
+    const totalSpent = monthlyOrders.reduce((sum, order) => 
+      sum + parseFloat(ethers.utils.formatEther(order.price)) * parseInt(order.purchasedQuantity), 0
+    );
+    const averageGreenScore = monthlyOrders.reduce((sum, order) => 
+      sum + parseInt(order.greenScore), 0) / totalOrders || 0;
+
+    // Generate report message in the requested format
+    const message = `
+Monthly Transaction Report - ${currentMonth} ${currentYear}
+
+Summary:
+- Total Orders: ${totalOrders}
+- Total Amount Spent: $${totalSpent.toFixed(2)}
+- Average Green Score: ${averageGreenScore.toFixed(1)}
+
+Detailed Order List:
+${monthlyOrders.map(order => `
+Product: ${order.name}
+Quantity: ${order.purchasedQuantity}
+Price: ${formatPrice(order.price)}
+Supplier: ${order.vendor.organization}
+Green Score: ${order.greenScore}
+Date: ${new Date(order.purchaseDate).toLocaleDateString()}
+----------------------------------------`).join('\n')}
+
+Generated on: ${currentDate.toLocaleString()}
+    `.trim();
+
+    return message;
+  };
+
+  const sendMonthlyReport = async () => {
+    try {
+      setIsSendingEmail(true);
+      
+      const templateParams = {
+        // You can make this configurable
+        message: generateMonthlyReport()
+      };
+      await emailjs.send(
+        'service_93ybpbn',
+        'template_e254j4c',
+        templateParams,
+        'hfx--3KcbLgX-EWIv'
+      );
+
+      alert('Monthly report has been sent to your email!');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('Failed to send email. Please try again.');
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
   if (error) {
     return (
       <div className="p-6 max-w-7xl mx-auto">
@@ -184,6 +252,14 @@ const OrderHistory = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Purchased Products History</h1>
         <p className="text-gray-600">Track your purchased inventory and their sustainability metrics</p>
+        <button
+          onClick={sendMonthlyReport}
+          disabled={isSendingEmail}
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-blue-300"
+        >
+         
+          <span>{isSendingEmail ? 'Sending...' : 'Email Monthly Report'}</span>
+        </button>
       </div>
 
       <div className="space-y-4">
