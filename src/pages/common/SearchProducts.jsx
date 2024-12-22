@@ -79,7 +79,7 @@ export const SearchProducts = () => {
     try {
       // For demo purposes, let's fetch products with IDs 1-3
       // In a real application, you would implement proper search logic
-      const productIds = [1, 2, 3];
+      const productIds = [1, 2, 3,4,5,6];
       const fetchedProducts = await Promise.all(
         productIds.map(id => fetchProduct(id))
       );
