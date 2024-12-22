@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useWeb3 } from '../../Web3Context';
 import { ethers } from 'ethers';
+import BarcodeScanner from '../../components/BarcodeScanner';
 
 export const SearchProducts = () => {
   // Web3 Context
@@ -28,6 +29,8 @@ export const SearchProducts = () => {
   const [products, setProducts] = useState([]);
   const [fetchError, setFetchError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Available categories
   const categories = [
@@ -124,6 +127,7 @@ export const SearchProducts = () => {
           </div>
         </div>
       </div>
+      <BarcodeScanner/>
 
       {/* Search Section */}
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -146,12 +150,22 @@ export const SearchProducts = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleSearch}
-            disabled={!account || isLoading}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg 
-                     hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+                     hover:bg-blue-700 transition-colors"
+            onClick={() => setIsScannerOpen(true)}
           >
-            Search
+            {/* <QrCode className="h-5 w-5 mr-2" /> */}
+            <BarcodeScanner
+            className="h-5 w-5 mr-2"
+          isOpen={isScannerOpen}
+          onClose={() => setIsScannerOpen(false)}
+          onScan={(barcode) => {
+            // Handle the scanned barcode
+            setIsScannerOpen(false);
+            // Navigate to product tracking or handle the barcode as needed
+          }}
+        />
+            Scan Barcode
           </motion.button>
 
           {/* Filter Button */}
