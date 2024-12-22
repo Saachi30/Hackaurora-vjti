@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import Header from '../../components/Header';
+
 import { 
   PlusCircleIcon, 
   SearchIcon, 
@@ -12,8 +14,9 @@ import {
   TrendingUpIcon,
   TrendingDownIcon
 } from 'lucide-react';
-
+import BarcodeScanner from '../../components/BarcodeScanner';
 const DashboardCard = ({ icon: Icon, title, description, onClick, className }) => (
+  
   <motion.div
     whileHover={{ scale: 1.03 }}
     whileTap={{ scale: 0.98 }}
@@ -76,27 +79,27 @@ export const VendorDashboard = () => {
   ];
   const currentStock = [
     {
-      id: '1',
-      name: 'Cheeselings',
-      quantity: 50,
+      id: 'PRD001',
+      name: 'Organic Cotton T-Shirt',
+      quantity: 250,
       unit: 'pieces',
       reorderPoint: 100,
-      sustainabilityScore: 82,
+      sustainabilityScore: 95,
       status: 'optimal',
     },
     {
-      id: '2',
-      name: 'Flour',
-      quantity: 20,
+      id: 'PRD002',
+      name: 'Recycled Denim Jeans',
+      quantity: 75,
       unit: 'pieces',
       reorderPoint: 80,
       sustainabilityScore: 90,
       status: 'low',
     },
     {
-      id: '3',
-      name: 'Jowar',
-      quantity: 60,
+      id: 'PRD003',
+      name: 'Bamboo Face Masks',
+      quantity: 500,
       unit: 'boxes',
       reorderPoint: 200,
       sustainabilityScore: 98,
@@ -118,8 +121,10 @@ export const VendorDashboard = () => {
   };
 
 
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 pt-2 pb-6 flex flex-col gap-7">
+      <Header />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -140,20 +145,32 @@ export const VendorDashboard = () => {
               Connect Wallet
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              onClick={() => navigate('/scan-product')}
-            >
-              Scan & Search
-            </motion.button>
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg 
+                     hover:bg-blue-700 transition-colors"
+            onClick={() => setIsScannerOpen(true)}
+          >
+            {/* <QrCode className="h-5 w-5 mr-2" /> */}
+            <BarcodeScanner
+            className="h-5 w-5 mr-2"
+          isOpen={isScannerOpen}
+          onClose={() => setIsScannerOpen(false)}
+          onScan={(barcode) => {
+            // Handle the scanned barcode
+            setIsScannerOpen(false);
+            // Navigate to product tracking or handle the barcode as needed
+          }}
+        />
+            Scan Barcode
+          </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              onClick={() => navigate('/ar-vr')}
+              onClick={() => navigate('/labor')}
             >
-              AR/VR Scan
+              Labor List
             </motion.button>
           </div>
         </div>
