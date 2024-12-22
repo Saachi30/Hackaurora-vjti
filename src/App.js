@@ -14,7 +14,7 @@ import { SearchProducts } from './pages/common/SearchProducts';
 import FloatingChatButton from './pages/common/FloatingChatButton';
 import { Web3Provider } from './Web3Context';
 import ProfileDashboard from './pages/common/Page/ProfilePage';
-
+import Labor from './pages/vendor/Labor';
 const App = () => {
   return (
     <Web3Provider>
@@ -43,7 +43,7 @@ const App = () => {
             <Route path="/vendor/orders" element={<OrderHistory />} />
             <Route path="/vendor/notices" element={<Notices />} />
             <Route path='/search-products' element={<SearchProducts/>}/>
-         
+            <Route path='/labor' element={<Labor/>}/>
 
           {/* Consumer Routes */}
     

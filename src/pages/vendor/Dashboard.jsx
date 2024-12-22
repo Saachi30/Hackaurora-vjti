@@ -123,7 +123,7 @@ export const VendorDashboard = () => {
 
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 pt-2 pb-6 flex flex-col gap-7">
+    <div className="min-h-screen bg-gradient-to-br from-green-500/10 to-blue-500/50 pt-2 pb-6 flex flex-col gap-7">
       <Header />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -243,7 +243,7 @@ export const VendorDashboard = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                onClick={() => navigate('/vendor/purchase-stock')}
+                onClick={() => navigate('/search-products')}
               >
                 <ShoppingCartIcon className="w-4 h-4" />
                 <span>Purchase Stock</span>
