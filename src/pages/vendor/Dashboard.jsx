@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
+import { useWeb3 } from '../../Web3Context';
 
 import { 
   PlusCircleIcon, 
@@ -15,8 +16,8 @@ import {
   TrendingDownIcon
 } from 'lucide-react';
 import BarcodeScanner from '../../components/BarcodeScanner';
+
 const DashboardCard = ({ icon: Icon, title, description, onClick, className }) => (
-  
   <motion.div
     whileHover={{ scale: 1.03 }}
     whileTap={{ scale: 0.98 }}
@@ -37,6 +38,64 @@ const DashboardCard = ({ icon: Icon, title, description, onClick, className }) =
 
 export const VendorDashboard = () => {
   const navigate = useNavigate();
+  const { contract, account, connectWallet } = useWeb3();
+  const [recentProducts, setRecentProducts] = useState([]);
+  const [currentStock, setCurrentStock] = useState([]);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (contract && account) {
+        try {
+          // Get vendor's purchased products
+          const purchasedProductIds = await contract.getVendorPurchasedProducts(account);
+          
+          // Fetch details for each product
+          const productPromises = purchasedProductIds.map(async (id) => {
+            const product = await contract.getProduct(id);
+            return {
+              id: id.toString(),
+              name: product.name,
+              quantity: product.quantity.toString(),
+              unit: 'pieces',
+              reorderPoint: Math.floor(product.quantity.toString() * 0.3), // 30% of current quantity
+              sustainabilityScore: product.greenScore.toString(),
+              status: getStockStatus(product.quantity.toString(), Math.floor(product.quantity.toString() * 0.3))
+            };
+          });
+
+          const products = await Promise.all(productPromises);
+          setCurrentStock(products);
+
+          // Set recent products (last 3)
+          setRecentProducts(products.slice(0, 3).map(product => ({
+            id: product.id,
+            name: product.name,
+            timestamp: Date.now() - Math.random() * 7200000 // Random time within last 2 hours
+          })));
+        } catch (error) {
+          console.error('Error fetching products:', error);
+        }
+      }
+    };
+
+    fetchProducts();
+  }, [contract, account]);
+
+  const getStockStatus = (quantity, reorderPoint) => {
+    if (quantity <= reorderPoint) return 'low';
+    if (quantity >= reorderPoint * 3) return 'excess';
+    return 'optimal';
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'low': return 'text-red-600 bg-red-50';
+      case 'optimal': return 'text-green-600 bg-green-50';
+      case 'excess': return 'text-orange-600 bg-orange-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
 
   const dashboardItems = [
     {
@@ -77,51 +136,10 @@ export const VendorDashboard = () => {
       path: '/environmental-impact'
     },
   ];
-  const currentStock = [
-    {
-      id: 'PRD001',
-      name: 'Organic Cotton T-Shirt',
-      quantity: 250,
-      unit: 'pieces',
-      reorderPoint: 100,
-      sustainabilityScore: 95,
-      status: 'optimal',
-    },
-    {
-      id: 'PRD002',
-      name: 'Recycled Denim Jeans',
-      quantity: 75,
-      unit: 'pieces',
-      reorderPoint: 80,
-      sustainabilityScore: 90,
-      status: 'low',
-    },
-    {
-      id: 'PRD003',
-      name: 'Bamboo Face Masks',
-      quantity: 500,
-      unit: 'boxes',
-      reorderPoint: 200,
-      sustainabilityScore: 98,
-      status: 'excess',
-    },
-  ];
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'low':
-        return 'text-red-600 bg-red-50';
-      case 'optimal':
-        return 'text-green-600 bg-green-50';
-      case 'excess':
-        return 'text-orange-600 bg-orange-50';
-      default:
-        return 'text-gray-600 bg-gray-50';
-    }
-  };
+ 
 
 
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-500/10 to-blue-500/50 pt-2 pb-6 flex flex-col gap-7">
       <Header />
@@ -130,6 +148,7 @@ export const VendorDashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto"
       >
+        {/* Header section with buttons */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Vendor Dashboard</h1>
@@ -140,7 +159,7 @@ export const VendorDashboard = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors border border-blue-600"
-              onClick={() => navigate('/vendor/connect-wallet')}
+              onClick={connectWallet}
             >
               Connect Wallet
             </motion.button>
@@ -214,25 +233,26 @@ export const VendorDashboard = () => {
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-xl p-6 shadow-md">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
             <div className="space-y-4">
-              {[1, 2, 3].map((_, index) => (
+              {recentProducts.map((product, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 rounded-full bg-green-500"></div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Product ID: #BT{Math.floor(Math.random() * 10000)}</p>
-                      <p className="text-xs text-gray-600">Verified on blockchain</p>
+                      <p className="text-sm font-medium text-gray-800">Product: {product.name}</p>
+                      <p className="text-xs text-gray-600">ID: {product.id}</p>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-500">2 hours ago</span>
+                  <span className="text-xs text-gray-500">
+                    {Math.floor((Date.now() - product.timestamp) / 3600000)} hours ago
+                  </span>
                 </div>
               ))}
             </div>
-          </div>
-       
+        </div>
+        
         </div>
            {/* Add the new Current Stock section */}
            <div className="mt-8 bg-white rounded-xl p-6 shadow-md">
@@ -311,7 +331,7 @@ export const VendorDashboard = () => {
               </tbody>
             </table>
           </div>
-      </div>
+        </div>
       </motion.div>
     </div>
   );
