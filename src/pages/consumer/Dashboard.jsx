@@ -213,14 +213,6 @@ export const ConsumerDashboard = () => {
                 : 'Discover and verify eco-friendly products with blockchain technology'}
             </p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            onClick={() => handleNavigation('/ar-vr', true)}
-          >
-            AR/VR Scan
-          </motion.button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
