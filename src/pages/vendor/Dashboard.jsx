@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import { useWeb3 } from '../../Web3Context';
-
+import GTranslate from '../../components/GTranslate';
 import { 
   PlusCircleIcon, 
   SearchIcon, 
@@ -143,6 +143,7 @@ export const VendorDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-500/10 to-blue-500/50 pt-2 pb-6 flex flex-col gap-7">
       <Header />
+      <GTranslate />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
