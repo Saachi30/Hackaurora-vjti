@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { User, Mail, Calendar, Award } from 'lucide-react';
+import { User, Mail, Calendar, Award, Package, Truck, DollarSign, Leaf } from 'lucide-react';
 import PDFModal from '../../../components/PDFModal';
 import CertificateCard from '../../../components/CertificateCard';
-import { achievements, carbonData, certificates } from '../../../data/mockData.js';
+import { achievements, performanceData, certificates } from '../../../data/mockData';
 
 const ProfileDashboard = () => {
   const [selectedCertificate, setSelectedCertificate] = useState(null);
@@ -18,10 +18,10 @@ const ProfileDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome, John Doe</h1>
-          <p className="text-gray-600 mt-1">Track your sustainability journey</p>
+          <h1 className="text-3xl font-bold text-gray-900">Welcome, Vendor Dashboard</h1>
+          <p className="text-gray-600 mt-1">Track your supply chain performance</p>
         </div>
-        <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
           <User className="w-4 h-4" />
           Edit Profile
         </button>
@@ -30,12 +30,33 @@ const ProfileDashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {[
-          { title: 'Average Monthly Footprint', value: '85.5 kg', progress: 85, color: 'bg-green-500' },
-          { title: 'Monthly Reduction', value: '12.5%', progress: 12, color: 'bg-blue-500' },
-          { title: 'Total Emissions', value: '1,240 kg', progress: 75, color: 'bg-purple-500' }
+          { 
+            title: 'Monthly Deliveries',
+            value: '150',
+            progress: 85,
+            color: 'bg-blue-500',
+            icon: <Truck className="w-5 h-5 text-blue-600" />
+          },
+          { 
+            title: 'CO2 Emissions/Delivery',
+            value: '75 kg',
+            progress: 75,
+            color: 'bg-green-500',
+            icon: <Leaf className="w-5 h-5 text-green-600" />
+          },
+          { 
+            title: 'Purchase Volume',
+            value: '$124,000',
+            progress: 92,
+            color: 'bg-purple-500',
+            icon: <DollarSign className="w-5 h-5 text-purple-600" />
+          }
         ].map((stat, index) => (
           <div key={index} className="bg-white rounded-xl p-6 hover:shadow-lg transition-shadow">
-            <h3 className="text-gray-600 text-sm font-medium mb-2">{stat.title}</h3>
+            <div className="flex items-center gap-2 mb-2">
+              {stat.icon}
+              <h3 className="text-gray-600 text-sm font-medium">{stat.title}</h3>
+            </div>
             <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
             <div className="w-full h-2 bg-gray-100 rounded-full mt-4">
               <div className={`h-2 ${stat.color} rounded-full transition-all duration-500`}
@@ -47,18 +68,18 @@ const ProfileDashboard = () => {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Graph Card */}
+        {/* Performance Graph */}
         <div className="bg-white rounded-xl p-6 hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-6">Carbon Footprint Trend</h2>
+          <h2 className="text-xl font-semibold mb-6">Monthly Delivery Performance</h2>
           <div className="h-64 w-full flex items-end justify-between gap-2">
-            {carbonData.map((data, index) => (
+            {performanceData.map((data, index) => (
               <div key={index} className="flex flex-col items-center w-full">
                 <div className="relative w-full group">
                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                    {data.footprint}kg
+                    {data.deliveries}
                   </div>
-                  <div className="w-full bg-green-500 rounded-t transition-all duration-300 hover:bg-green-600"
-                       style={{ height: `${(data.footprint / 120) * 200}px` }} />
+                  <div className="w-full bg-blue-500 rounded-t transition-all duration-300 hover:bg-blue-600"
+                       style={{ height: `${(data.deliveries / 200) * 200}px` }} />
                 </div>
                 <span className="text-sm text-gray-600 mt-2">{data.month}</span>
               </div>
@@ -66,15 +87,15 @@ const ProfileDashboard = () => {
           </div>
         </div>
 
-        {/* Personal Details Card */}
+        {/* Vendor Details Card */}
         <div className="bg-white rounded-xl p-6 hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-6">Personal Details</h2>
+          <h2 className="text-xl font-semibold mb-6">Vendor Details</h2>
           <div className="space-y-6">
             {[
-              { icon: <User className="w-4 h-4 text-gray-500" />, label: 'Full Name', value: 'John Doe' },
-              { icon: <Mail className="w-4 h-4 text-gray-500" />, label: 'Email', value: 'john@example.com' },
-              { icon: <Award className="w-4 h-4 text-gray-500" />, label: 'Eco Score', value: '85' },
-              { icon: <Calendar className="w-4 h-4 text-gray-500" />, label: 'Member Since', value: '10-11-24' }
+              { icon: <User className="w-4 h-4 text-gray-500" />, label: 'Company Name', value: 'ABC Suppliers Ltd.' },
+              { icon: <Package className="w-4 h-4 text-gray-500" />, label: 'Vendor ID', value: 'VEN2024001' },
+              { icon: <Award className="w-4 h-4 text-gray-500" />, label: 'Performance Score', value: '85/100' },
+              { icon: <Calendar className="w-4 h-4 text-gray-500" />, label: 'Partner Since', value: '10-11-24' }
             ].map((detail, index) => (
               <div key={index} className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 {detail.icon}
@@ -87,9 +108,9 @@ const ProfileDashboard = () => {
           </div>
         </div>
 
-        {/* Certificates Section */}
+        {/* Certificates Section - Kept as is */}
         <div className="bg-white rounded-xl p-6 md:col-span-2 hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-6">Sustainability Certificates</h2>
+          <h2 className="text-xl font-semibold mb-6">Compliance Certificates</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {certificates.map((cert, index) => (
               <CertificateCard 
@@ -103,7 +124,7 @@ const ProfileDashboard = () => {
 
         {/* Achievements Card */}
         <div className="bg-white rounded-xl p-6 md:col-span-2 hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-6">Recent Achievements</h2>
+          <h2 className="text-xl font-semibold mb-6">Performance Achievements</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {achievements.map((achievement, index) => (
               <div key={index} className="flex items-start space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors">

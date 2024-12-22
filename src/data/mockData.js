@@ -1,17 +1,17 @@
-import { Trophy, Medal, Target, Users, Leaf } from 'lucide-react';
+import { Trophy, Medal, Target, Users, Leaf, TrendingDown } from 'lucide-react';
 
 export const achievements = [
-  { title: 'Carbon Warrior', description: 'Reduced carbon footprint by 50%', icon: <Trophy className="w-5 h-5 text-green-600" /> },
-  { title: 'Eco Champion', description: 'Completed 10 eco-challenges', icon: <Medal className="w-5 h-5 text-blue-600" /> },
-  { title: 'Green Influencer', description: 'Inspired 5 friends to join', icon: <Target className="w-5 h-5 text-purple-600" /> }
+  { title: 'Top Performer', description: 'Maintained 99% delivery accuracy', icon: <Trophy className="w-5 h-5 text-green-600" /> },
+  { title: 'Quality Master', description: 'Zero defects for 6 months', icon: <Medal className="w-5 h-5 text-blue-600" /> },
+  { title: 'Cost Optimizer', description: 'Reduced costs by 15%', icon: <TrendingDown className="w-5 h-5 text-purple-600" /> }
 ];
 
-export const carbonData = [
-  { month: 'Jan', footprint: 120 },
-  { month: 'Feb', footprint: 100 },
-  { month: 'Mar', footprint: 90 },
-  { month: 'Apr', footprint: 85 },
-  { month: 'May', footprint: 75 }
+export const performanceData = [
+  { month: 'Jan', deliveries: 120 },
+  { month: 'Feb', deliveries: 145 },
+  { month: 'Mar', deliveries: 135 },
+  { month: 'Apr', deliveries: 160 },
+  { month: 'May', deliveries: 150 }
 ];
 
 export const certificates = [
@@ -20,16 +20,16 @@ export const certificates = [
     status: 'Awarded',
     score: 92,
     icon: <Users className="w-6 h-6 text-blue-600" />,
-    criteria: 'Maintained >85% labor score for 12 months',
+    criteria: 'Maintained >85% labor compliance score for 12 months',
     awardedDate: '2024-03-15',
-    name: 'John Doe'
+    name: 'Param Gogia'
   },
   {
-    title: 'Sustainable Practice Leader',
+    title: 'Green Supply Chain Leader',
     status: 'In Progress',
     score: 78,
     icon: <Leaf className="w-6 h-6 text-green-600" />,
-    criteria: 'Maintain <80kg monthly carbon footprint',
+    criteria: 'Maintain <80kg CO2 per delivery',
     requiredScore: 85
   }
 ];
