@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Profile from '../assets/profile.png';
+import World from '../assets/multilingual.png';
 const isAuthenticated = () => {
   // Replace this with your actual authentication check
   return localStorage.getItem('token') !== null;
@@ -57,7 +58,7 @@ const Header = () => {
           className="text-2xl font-bold text-blue-600 cursor-pointer"
           onClick={() => navigate('/')}
         >
-          TrackBack
+          GreenTrack
         </motion.h1>
 
         {/* Action Buttons */}
@@ -146,6 +147,12 @@ const Header = () => {
               Login
             </button>
           )}
+          <img
+                  src={World}
+                  alt="World"
+                  className="w-9 h-9 cursor-pointer rounded-full"
+                />
+              
         </div>
       </div>
     </motion.header>
