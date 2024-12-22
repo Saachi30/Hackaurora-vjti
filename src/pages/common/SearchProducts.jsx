@@ -265,12 +265,12 @@ export const SearchProducts = () => {
 
                 {/* Right Section - Details */}
                 <div className="w-1/3 p-6 bg-gray-50 flex flex-col justify-center space-y-4">
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <Shield className="h-5 w-5 text-green-500 mr-2" />
                     <span className="text-sm font-medium">
                       Green Score: {product.verificationScore}%
                     </span>
-                  </div>
+                  </div> */}
                   
                   <div className="flex items-center">
                     <Box className="h-5 w-5 text-gray-400 mr-2" />
@@ -285,9 +285,16 @@ export const SearchProducts = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <LinkIcon className="h-5 w-5 text-gray-400 mr-2" />
-                    <span className="text-sm text-gray-600 truncate">{product.currentVendor}</span>
-                  </div>
+  <LinkIcon className="h-5 w-5 text-gray-400 mr-2" />
+  <span
+    className="text-sm text-gray-600 truncate cursor-pointer"
+    onClick={() => navigator.clipboard.writeText(product.currentVendor)}
+    
+    title="Click to copy wallet address"
+  >
+    Vendor Wallet: {product.currentVendor}
+  </span>
+</div>
                 </div>
               </motion.div>
             ))}
